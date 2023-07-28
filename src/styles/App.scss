@@ -45,8 +45,10 @@
     width: 100%;
 
     .content {
-      h1 {
-        margin-left: 16px;
+      margin: 16px;
+      
+      .divider {
+        margin-bottom: 16px;
       }
 
       .countryOptionContainer {
@@ -109,6 +111,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      padding: 16px 0;
 
       .searchBar {
         width: 320px
@@ -118,10 +121,13 @@
     .content {
       width: 500px;
       margin: auto;
-      padding: 16px;
+      padding: 16px 0;
     }
 
     .countrySelectContainer {
+      display: flex;
+      justify-content: center;
+
       .content {
         h1 {
           font-size: 48px;

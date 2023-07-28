@@ -231,7 +231,11 @@ function App() {
           <input type="submit" value="Go" />
         </form>
 
-        <p>Enter a country's name to view its info from the free Countries API.</p>
+        <p>
+          Enter a country's name to view its info from the free <a href="https://restcountries.com/" target="_blank" rel="noreferrer">
+             REST Countries API.
+          </a>
+        </p>
       </div>
 
       {!isLoading && activeCountry.name === null && options[0].name !== null && renderCountrySelect()}
