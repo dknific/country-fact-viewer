@@ -190,7 +190,7 @@ function App() {
     return (
       <div className="countrySelectContainer">
         <div className="content">
-          <h1>Results:</h1>
+          <h1>🔍 Results:</h1>
           <div className="divider" />
           {options.map(country => (
             <div className="countryOptionContainer" key={country.name} onClick={() => setActiveCountry(country)}>
@@ -239,6 +239,7 @@ function App() {
       <div className="homeScreenContainer">
         <div className="content">
           <h1>Search for a country to get started!</h1>
+          <p>🌎</p>
         </div>
       </div>
     );
