@@ -1,4 +1,4 @@
-export interface Country {
+export type Country = {
   name: string | null,
   capital: string | null,
   continent: string | null,
@@ -8,7 +8,7 @@ export interface Country {
   population: string | null
 };
 
-export interface ErrorObj {
+type ErrorObj = {
   wasServerError: boolean,
   wasSearchError: boolean,
   failedSearchTerm: string
@@ -30,4 +30,4 @@ export const EMPTY_ERROR_OBJ: ErrorObj = {
   failedSearchTerm: ''
 };
 
-export const EMPTY_OPTIONS = [EMPTY_COUNTRY];
+export const EMPTY_OPTIONS: Array<Country> = [EMPTY_COUNTRY];

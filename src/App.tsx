@@ -1,6 +1,6 @@
 import { SyntheticEvent, useState } from 'react';
-import { formatActiveCountry } from './methods';
-import { EMPTY_COUNTRY, EMPTY_ERROR_OBJ, EMPTY_OPTIONS } from './types';
+import { formatActiveCountry } from './assets/methods';
+import { EMPTY_COUNTRY, EMPTY_ERROR_OBJ, EMPTY_OPTIONS } from './assets/types';
 import './styles/App.scss';
 
 function App() {
@@ -45,6 +45,18 @@ function App() {
     setUserInput(e.currentTarget.value);
   }
 
+  function renderLoadingScreen() {
+    return (
+      <div className="loadingScreenContainer">
+        <div className="content">
+          <p>Loading results,</p>
+          <p>please wait...</p>
+          <span className="loader"></span>
+        </div>
+      </div>
+    );
+  }
+
   function renderErrorScreen() {
     return (
       <div className="errorContainer">
@@ -68,7 +80,7 @@ function App() {
     );
   }
 
-  function renderCountrySelect() {
+  function renderCountrySelectScreen() {
     return (
       <div className="countrySelectContainer">
         <div className="content">
@@ -85,19 +97,7 @@ function App() {
     );
   }
 
-  function renderLoadingScreen() {
-    return (
-      <div className="loadingScreenContainer">
-        <div className="content">
-          <p>Loading results,</p>
-          <p>please wait...</p>
-          <span className="loader"></span>
-        </div>
-      </div>
-    );
-  }
-
-  function renderCountryInfoPanel() {
+  function renderCountryInfoScreen() {
     return (
       <div className="countryContainer">
         <div className="content">
@@ -154,13 +154,12 @@ function App() {
         && !hasError.wasServerError
         && renderHomeScreen()
       }
-      {!isLoading && activeCountry.name === null && options[0].name !== null && renderCountrySelect()}
-      {!isLoading && activeCountry.name !== null && renderCountryInfoPanel()}
       {!isLoading
         && (hasError.wasSearchError || hasError.wasServerError)
         && renderErrorScreen()
       }
-
+      {!isLoading && activeCountry.name === null && options[0].name !== null && renderCountrySelectScreen()}
+      {!isLoading && activeCountry.name !== null && renderCountryInfoScreen()}
     </div>
   );
 }
