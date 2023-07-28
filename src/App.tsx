@@ -1,21 +1,21 @@
 import { SyntheticEvent, useState } from 'react';
-import { formatActiveCountry } from './assets/methods';
-import { EMPTY_COUNTRY, EMPTY_ERROR_OBJ, EMPTY_OPTIONS } from './assets/types';
+import { formatActiveCountry, generateSearchErrorObject, NO_ERROR, SERVER_ERROR } from './assets/methods';
+import { Country, ErrorObject } from './assets/types';
 import './styles/App.scss';
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(EMPTY_ERROR_OBJ);
+  const [hasError, setHasError] = useState<ErrorObject>(NO_ERROR);
   const [userInput, setUserInput] = useState('');
-  const [activeCountry, setActiveCountry] = useState(EMPTY_COUNTRY);
-  const [options, setOptions] = useState(EMPTY_OPTIONS);
+  const [activeCountry, setActiveCountry] = useState<Country | null>(null);
+  const [options, setOptions] = useState<Country[]>([]);
 
   async function getCountryInfoByName(e: SyntheticEvent) {
     e.preventDefault();
-    setActiveCountry(EMPTY_COUNTRY);
-    setHasError(EMPTY_ERROR_OBJ);
+    setActiveCountry(null);
+    setHasError(NO_ERROR);
     setIsLoading(true);
-    setOptions(EMPTY_OPTIONS);
+    setOptions([]);
 
     try {
       const response = await fetch(`https://restcountries.com/v3.1/name/${userInput}`)
@@ -24,18 +24,19 @@ function App() {
       // Because the API returns an Object for bad requests:
       if (Array.isArray(response)) {
         if (response.length === 1) {
-          const active = formatActiveCountry(response[0]);
+          const active: Country = formatActiveCountry(response[0]);
           setActiveCountry(active);
         } else {
-          const newOptions = response.map(countryObj => formatActiveCountry(countryObj));
+          const newOptions: Country[] = response.map(countryObj => formatActiveCountry(countryObj));
           setOptions(newOptions);
         }
       } else {
-        setHasError({ wasServerError: false, wasSearchError: true, failedSearchTerm: userInput });
+        const searchErrorObject: ErrorObject = generateSearchErrorObject(userInput);
+        setHasError(searchErrorObject);
       }
     } catch (error) {
       console.warn(error);
-      setHasError({ wasServerError: true, wasSearchError: false, failedSearchTerm: '' });
+      setHasError(SERVER_ERROR);
     }
     
     setIsLoading(false);
@@ -80,14 +81,18 @@ function App() {
     );
   }
 
-  function renderCountrySelectScreen() {
+  function renderCountrySelectScreen(countryResults: Array<Country>) {
     return (
       <div className="countrySelectContainer">
         <div className="content">
           <h1>🔍 Results:</h1>
           <div className="divider" />
-          {options.map(country => (
-            <div className="countryOptionContainer" key={country.name} onClick={() => setActiveCountry(country)}>
+          {countryResults.length && countryResults.map(country => (
+            <div
+              className="countryOptionContainer"
+              key={country.name}
+              onClick={() => setActiveCountry(country)}
+            >
               <p className="flag">{country.flag}</p>
               <p className="countryOptionName">{country.name}</p>
             </div>
@@ -97,20 +102,20 @@ function App() {
     );
   }
 
-  function renderCountryInfoScreen() {
+  function renderCountryInfoScreen(country: Country) {
     return (
       <div className="countryContainer">
         <div className="content">
           <div className="countryNameContainer">
-            <p>{activeCountry.flag}</p>
-            <h1>{activeCountry.name}</h1>
+            <p>{country.flag}</p>
+            <h1>{country.name}</h1>
           </div>
           <div className="divider" />
-          <p><b>Population:</b> {activeCountry.population} people</p>
-          <p><b>Capital City:</b> {activeCountry.capital}</p>
-          <p><b>Currency:</b> {activeCountry.currency}</p>
-          <p><b>Continent:</b> {activeCountry.continent}</p>
-          <p><b>Languages:</b> {activeCountry.languages}</p>
+          <p><b>Population:</b> {country.population} people</p>
+          <p><b>Capital City:</b> {country.capital}</p>
+          <p><b>Currency:</b> {country.currency}</p>
+          <p><b>Continent:</b> {country.continent}</p>
+          <p><b>Languages:</b> {country.languages}</p>
         </div>
       </div>
     );
@@ -127,6 +132,14 @@ function App() {
     );
   }
 
+  const showCountryInfoScreen = !isLoading && activeCountry;
+  const showErrorScreen =
+    !isLoading && (hasError.wasSearchError || hasError.wasServerError);
+  const showHomeScreen =
+    !isLoading && !activeCountry && options.length === 0 && hasError === NO_ERROR;
+  const showCountrySelectScreen =
+    !isLoading && !activeCountry && options.length > 1;
+
   return (
     <div className="App">
       <div className="searchBarContainer">
@@ -140,26 +153,18 @@ function App() {
         </form>
 
         <p>
-          Enter a country's name to view its info from the free <a href="https://restcountries.com/" target="_blank" rel="noreferrer">
-             REST Countries API.
+          Enter a country's name to view its info from the free{" "}
+          <a href="https://restcountries.com/" target="_blank" rel="noreferrer">
+            REST Countries API.
           </a>
         </p>
       </div>
 
       {isLoading && renderLoadingScreen()}
-      {!isLoading
-        && activeCountry.name === null
-        && options[0].name === null
-        && !hasError.wasSearchError
-        && !hasError.wasServerError
-        && renderHomeScreen()
-      }
-      {!isLoading
-        && (hasError.wasSearchError || hasError.wasServerError)
-        && renderErrorScreen()
-      }
-      {!isLoading && activeCountry.name === null && options[0].name !== null && renderCountrySelectScreen()}
-      {!isLoading && activeCountry.name !== null && renderCountryInfoScreen()}
+      {showErrorScreen && renderErrorScreen()}
+      {showHomeScreen && renderHomeScreen()}
+      {showCountrySelectScreen && renderCountrySelectScreen(options)}
+      {showCountryInfoScreen && renderCountryInfoScreen(activeCountry)}
     </div>
   );
 }

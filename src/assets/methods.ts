@@ -1,4 +1,4 @@
-import { Country } from './types';
+import { Country, ErrorObject } from './types';
 
 export function formatActiveCountry(rawResponse: any) {
   const newCountry: Country = {
@@ -85,3 +85,9 @@ export function formatLanguagesString(languagesObj: any) {
 
   return outString;
 }
+
+export function generateSearchErrorObject(failedTerm: string) {
+  return new ErrorObject(false, true, failedTerm);
+}
+export const NO_ERROR: ErrorObject = new ErrorObject(false, false, null);
+export const SERVER_ERROR: ErrorObject = new ErrorObject(true, false, null);

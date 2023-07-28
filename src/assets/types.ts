@@ -1,33 +1,21 @@
 export type Country = {
-  name: string | null,
-  capital: string | null,
-  continent: string | null,
-  currency: string | null,
-  flag: string | null,
-  languages: string | null,
-  population: string | null
+  name: string,
+  capital: string,
+  continent: string,
+  currency: string,
+  flag: string,
+  languages: string,
+  population: string
 };
 
-type ErrorObj = {
-  wasServerError: boolean,
-  wasSearchError: boolean,
-  failedSearchTerm: string
-};
+export class ErrorObject {
+  wasServerError: boolean;
+  wasSearchError: boolean;
+  failedSearchTerm: string | null;
 
-export const EMPTY_COUNTRY: Country = {
-  name: null,
-  capital: null,
-  continent: null,
-  currency: null,
-  flag: null,
-  languages: null,
-  population: null
+  constructor(wasServer: boolean, wasSearch: boolean, term: string | null) {
+    this.wasServerError = wasServer;
+    this.wasSearchError = wasSearch;
+    this.failedSearchTerm = term;
+  }
 };
-
-export const EMPTY_ERROR_OBJ: ErrorObj = {
-  wasServerError: false,
-  wasSearchError: false,
-  failedSearchTerm: ''
-};
-
-export const EMPTY_OPTIONS: Array<Country> = [EMPTY_COUNTRY];
