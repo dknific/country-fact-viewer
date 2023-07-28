@@ -1,17 +1,33 @@
 import { SyntheticEvent, useState } from 'react';
 import './styles/App.scss';
 
-const INITIAL_COUNTRY = {
-  name: '',
-  capital: '',
-  continent: '',
-  currency: '',
-  flag: '',
-  languages: '',
-  population: '',
+interface Country {
+  name: string | null,
+  capital: string | null,
+  continent: string | null,
+  currency: string | null,
+  flag: string | null,
+  languages: string | null,
+  population: string | null
 };
 
-const INITIAL_ERROR_OBJ = {
+interface ErrorObj {
+  wasServerError: boolean,
+  wasSearchError: boolean,
+  failedSearchTerm: string
+};
+
+const INITIAL_COUNTRY: Country = {
+  name: null,
+  capital: null,
+  continent: null,
+  currency: null,
+  flag: null,
+  languages: null,
+  population: null
+};
+
+const INITIAL_ERROR_OBJ: ErrorObj = {
   wasServerError: false,
   wasSearchError: false,
   failedSearchTerm: ''
@@ -19,15 +35,16 @@ const INITIAL_ERROR_OBJ = {
 
 const OPTIONS = [INITIAL_COUNTRY, INITIAL_COUNTRY];
 
-function formatPopulationString(number: number) {
-  const numString = number.toString();
-  const charCount = numString.length;
-  let stringParts, cutIndex, cutIndex2, cutIndex3;
+function formatPopulationString(number: number): string {
+  const numString: string = number.toString();
+  const charCount: number = numString.length;
+  let cutIndex, cutIndex2, cutIndex3;
+  let outString: string = '';
 
   if (numString.length < 4) {
-    return numString;
+    outString = numString;
   } else if (charCount >= 4 && charCount < 7) {
-    return [
+    outString = [
       numString.slice(0, charCount - 3),
       numString.slice(charCount - 3, charCount),
     ].join(',');
@@ -35,7 +52,7 @@ function formatPopulationString(number: number) {
     if (charCount === 7) cutIndex = 1;
     else if (charCount === 8) cutIndex = 2;
     else if (charCount === 9) cutIndex = 3;
-    return [
+    outString = [
       numString.slice(0, cutIndex),
       ',',
       numString.slice(cutIndex, charCount - 3),
@@ -52,13 +69,13 @@ function formatPopulationString(number: number) {
       cutIndex2 = 5;
       cutIndex3 = 8;
     }
-    else if (charCount === 12) {
+    else if (charCount >= 12) {
       cutIndex = 3;
       cutIndex2 = 6;
       cutIndex3 = 9;
     }
 
-    return [
+    outString = [
       numString.slice(0, cutIndex),
       ',',
       numString.slice(cutIndex, cutIndex2),
@@ -68,43 +85,48 @@ function formatPopulationString(number: number) {
       numString.slice(charCount - 3, charCount)
     ].join('');
   }
+
+  return outString;
 }
+
+function formatLanguagesString(languagesObj: any) {
+  const objectKeys = Object.keys(languagesObj);
+  let outString: string = languagesObj[objectKeys[0]];
+  let numOfLanguages: number = objectKeys.length;
+  
+  if (numOfLanguages > 1) {
+    for (let i = 1; i < numOfLanguages; i++) {
+      outString += `, ${languagesObj[objectKeys[i]]}`;
+    }
+  }
+
+  return outString;
+}
+
+function formatActiveCountry(rawResponse: any) {
+  const newCountry: Country = {
+    name: rawResponse.name.common,
+    flag: rawResponse.flag,
+    capital: rawResponse.capital?.[0] ?? 'n/a',
+    continent: rawResponse.continents?.[0] ?? 'n/a',
+    currency: rawResponse.currencies
+      ? `The ${rawResponse.currencies[Object.keys(rawResponse.currencies)[0]].name}`
+      : 'n/a',
+    languages: rawResponse.languages
+      ? formatLanguagesString(rawResponse.languages)
+      : 'n/a',
+    population: rawResponse.population ? formatPopulationString(rawResponse.population) : 'n/a',
+  };
+
+  return newCountry;
+}
+
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(INITIAL_ERROR_OBJ);
   const [userInput, setUserInput] = useState('');
   const [activeCountry, setActiveCountry] = useState(INITIAL_COUNTRY);
   const [options, setOptions] = useState(OPTIONS);
-
-  function formatLanguagesString(languagesObj: any) {
-    const objectKeys = Object.keys(languagesObj);
-    let outString: string = languagesObj[objectKeys[0]];
-    let numOfLanguages: number = objectKeys.length;
-    
-    if (numOfLanguages > 1) {
-      for (let i = 1; i < numOfLanguages; i++) {
-        outString += `, ${languagesObj[objectKeys[i]]}`;
-      }
-    }
-
-    return outString;
-  }
-
-  function formatActiveCountry(rawResponse: any) {
-    return {
-      name: rawResponse.name.common,
-      flag: rawResponse.flag,
-      capital: rawResponse.capital?.[0] ?? 'n/a',
-      continent: rawResponse.continents?.[0] ?? 'n/a',
-      currency: rawResponse.currencies
-        ? rawResponse.currencies[Object.keys(rawResponse.currencies)[0]].name
-        : 'n/a',
-      languages: rawResponse.languages
-        ? formatLanguagesString(rawResponse.languages)
-        : 'n/a',
-      population: rawResponse.population ? formatPopulationString(rawResponse.population) : 'n/a',
-    };
-  }
 
   async function getCountryInfoByName(e: SyntheticEvent) {
     e.preventDefault();
@@ -124,7 +146,6 @@ function App() {
           setActiveCountry(active);
         } else {
           const options = response.map(countryObj => formatActiveCountry(countryObj));
-          console.log(options[0].name);
           setOptions(options);
         }
       } else {
@@ -150,7 +171,7 @@ function App() {
         <div className="divider" />
         {hasError.wasSearchError && (
           <>
-            <p>The term '{hasError.failedSearchTerm}' didn't return any results.</p>
+            <p>The term '<b><i>{hasError.failedSearchTerm}</i></b>' didn't return any results.</p>
             <p>Try again with a different query, or try spelling it differently.</p>
           </>
         )}
@@ -170,6 +191,7 @@ function App() {
       <div className="countrySelectContainer">
         <div className="content">
           <h1>Results:</h1>
+          <div className="divider" />
           {options.map(country => (
             <div className="countryOptionContainer" onClick={() => setActiveCountry(country)}>
               <p className="flag">{country.flag}</p>
@@ -189,7 +211,7 @@ function App() {
           <div className="divider" />
           <p><b>Population:</b> {activeCountry.population} people</p>
           <p><b>Capital City:</b> {activeCountry.capital}</p>
-          <p><b>Currency:</b> The {activeCountry.currency}</p>
+          <p><b>Currency:</b> {activeCountry.currency}</p>
           <p><b>Continent:</b> {activeCountry.continent}</p>
           <p><b>Languages:</b> {activeCountry.languages}</p>
         </div>
@@ -212,8 +234,8 @@ function App() {
         <p>Enter a country's name to view its info from the free Countries API.</p>
       </div>
 
-      {!isLoading && activeCountry.name === '' && options[0].name !== '' && renderCountrySelect()}
-      {!isLoading && activeCountry.name !== '' && renderCountryInfoPanel()}
+      {!isLoading && activeCountry.name === null && options[0].name !== null && renderCountrySelect()}
+      {!isLoading && activeCountry.name !== null && renderCountryInfoPanel()}
       {!isLoading
         && (hasError.wasSearchError || hasError.wasServerError)
         && renderErrorScreen()
