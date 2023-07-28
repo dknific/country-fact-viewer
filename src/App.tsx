@@ -10,6 +10,14 @@ function App() {
   const [activeCountry, setActiveCountry] = useState<Country | null>(null);
   const [options, setOptions] = useState<Country[]>([]);
 
+  const showCountryInfoScreen = !isLoading && activeCountry;
+  const showErrorScreen =
+    !isLoading && (hasError.wasSearchError || hasError.wasServerError);
+  const showHomeScreen =
+    !isLoading && !activeCountry && options.length === 0 && hasError === NO_ERROR;
+  const showCountrySelectScreen =
+    !isLoading && !activeCountry && options.length > 1;
+
   async function getCountryInfoByName(e: SyntheticEvent) {
     e.preventDefault();
     setActiveCountry(null);
@@ -131,14 +139,6 @@ function App() {
       </div>
     );
   }
-
-  const showCountryInfoScreen = !isLoading && activeCountry;
-  const showErrorScreen =
-    !isLoading && (hasError.wasSearchError || hasError.wasServerError);
-  const showHomeScreen =
-    !isLoading && !activeCountry && options.length === 0 && hasError === NO_ERROR;
-  const showCountrySelectScreen =
-    !isLoading && !activeCountry && options.length > 1;
 
   return (
     <div className="App">
