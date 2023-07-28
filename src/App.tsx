@@ -193,7 +193,7 @@ function App() {
           <h1>Results:</h1>
           <div className="divider" />
           {options.map(country => (
-            <div className="countryOptionContainer" onClick={() => setActiveCountry(country)}>
+            <div className="countryOptionContainer" key={country.name} onClick={() => setActiveCountry(country)}>
               <p className="flag">{country.flag}</p>
               <p className="countryOptionName">{country.name}</p>
             </div>
@@ -203,17 +203,42 @@ function App() {
     );
   }
 
+  function renderLoadingScreen() {
+    return (
+      <div className="loadingScreenContainer">
+        <div className="content">
+          <p>Loading results,</p>
+          <p>please wait...</p>
+          <span className="loader"></span>
+        </div>
+      </div>
+    );
+  }
+
   function renderCountryInfoPanel() {
     return (
       <div className="countryContainer">
         <div className="content">
-          <h1>{activeCountry.flag} {activeCountry.name}</h1>
+          <div className="countryNameContainer">
+            <p>{activeCountry.flag}</p>
+            <h1>{activeCountry.name}</h1>
+          </div>
           <div className="divider" />
           <p><b>Population:</b> {activeCountry.population} people</p>
           <p><b>Capital City:</b> {activeCountry.capital}</p>
           <p><b>Currency:</b> {activeCountry.currency}</p>
           <p><b>Continent:</b> {activeCountry.continent}</p>
           <p><b>Languages:</b> {activeCountry.languages}</p>
+        </div>
+      </div>
+    );
+  }
+
+  function renderHomeScreen() {
+    return (
+      <div className="homeScreenContainer">
+        <div className="content">
+          <h1>Search for a country to get started!</h1>
         </div>
       </div>
     );
@@ -238,6 +263,14 @@ function App() {
         </p>
       </div>
 
+      {isLoading && renderLoadingScreen()}
+      {!isLoading
+        && activeCountry.name === null
+        && options[0].name === null
+        && !hasError.wasSearchError
+        && !hasError.wasServerError
+        && renderHomeScreen()
+      }
       {!isLoading && activeCountry.name === null && options[0].name !== null && renderCountrySelect()}
       {!isLoading && activeCountry.name !== null && renderCountryInfoPanel()}
       {!isLoading
