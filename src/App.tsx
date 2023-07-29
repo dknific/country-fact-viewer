@@ -1,7 +1,7 @@
 import { SyntheticEvent, useState } from 'react';
 import { formatActiveCountry, generateSearchErrorObject, NO_ERROR, SERVER_ERROR } from './assets/methods';
 import { Country, ErrorObject } from './assets/types';
-import './styles/App.scss';
+import './App.scss';
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
