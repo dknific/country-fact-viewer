@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from 'react';
+import { KeyboardEvent, SyntheticEvent, useState } from 'react';
 import { formatActiveCountry, generateSearchErrorObject, NO_ERROR, SERVER_ERROR } from './assets/methods';
 import { Country, ErrorObject } from './assets/types';
 import './App.scss';
@@ -50,7 +50,8 @@ function App() {
     setIsLoading(false);
   }
 
-  function handleKeyUp(e: SyntheticEvent<HTMLInputElement>) {
+  function handleKeyUp(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') e.currentTarget.blur();
     setUserInput(e.currentTarget.value);
   }
 
@@ -149,7 +150,7 @@ function App() {
             placeholder="Type a country name..."
             onKeyUp={(e) => handleKeyUp(e)}
           />
-          <input type="submit" value="Go" />
+          <input type="submit" value="Go" className="submitButton" />
         </form>
 
         <p>

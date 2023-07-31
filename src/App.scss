@@ -43,8 +43,9 @@ body {
           padding-left: 12px;
         }
 
-        input[type=submit] {
+        .submitButton {
           width: 50px;
+          background: #EFEFEF;
           border: none;
           border-radius: 0 5px 5px 0;
         }
