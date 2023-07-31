@@ -43,11 +43,13 @@ body {
         }
 
         .submitButton {
-          width: 50px !important;
+          appearance: none;
+          -webkit-appearance: none;
+          width: 50px;
           background: #EFEFEF;
-          color: black !important;
-          border: none !important;
-          border-radius: 0 5px 5px 0 !important;
+          color: black;
+          border: none;
+          border-radius: 0 5px 5px 0;
         }
       }
 
