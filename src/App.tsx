@@ -46,7 +46,7 @@ function App() {
       console.warn(error);
       setHasError(SERVER_ERROR);
     }
-    
+
     setIsLoading(false);
   }
 
